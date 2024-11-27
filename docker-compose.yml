@@ -1,0 +1,41 @@
+services:
+
+  psql-portal:
+    container_name: psql-portal
+    image: postgres
+
+    
+    volumes:
+      - ./data/postgres/data:/var/lib/postgresql/data
+
+    ports:
+      - 5432:5432
+      
+    env_file:
+      - path: ./.env 
+        required: true
+
+  application:
+    container_name: portal
+
+    build:
+      context: .
+      
+    ports:
+      - 8000:8000
+
+    volumes:
+      - ./application:/application
+      - ./data/web/static:/data/web/static/
+      - ./data/web/media:/data/web/media/
+      
+    depends_on:
+      - psql-portal
+
+    env_file: 
+      - path: ./.env
+        required: true
+  
+networks:
+  app_network:
+    driver: bridge
